@@ -1,0 +1,28 @@
+export const ALL_SKILLS = [
+    "C", "C++", "Java", "Python", "JavaScript", "TypeScript",
+    "React", "Angular", "Vue.js", "Node.js", "Express.js",
+    "Django", "Flask", "Spring Boot", "Ruby on Rails",
+    "HTML", "CSS", "Tailwind CSS", "Bootstrap",
+    "MongoDB", "PostgreSQL", "MySQL", "Redis",
+    "Docker", "Kubernetes", "AWS", "Azure", "GCP",
+    "Git", "Linux", "REST API", "GraphQL",
+    "Machine Learning", "Deep Learning", "TensorFlow", "PyTorch",
+    "Data Structures", "Algorithms", "MERN", "MEAN",
+    "Kotlin", "Swift", "Flutter", "React Native",
+    "Figma", "UI/UX", "Agile", "Scrum",
+];
+export const defaultProfile = {
+    name: "Aarav Sharma",
+    email: "aarav@uni.edu",
+    phone: "+91 98765 43210",
+    department: "Computer Science",
+    rollNumber: "CS2022001",
+    graduationYear: 2026,
+    cgpa: 9.2,
+    tenthMarks: 92.5,
+    twelfthMarks: 88.0,
+    backlogs: 0,
+    skills: ["React", "Node.js", "Python", "TypeScript"],
+    resumeFile: null,
+    resumeName: "",
+};
