@@ -8,6 +8,7 @@ import { ThemeProvider } from "next-themes";
 import LandingPage from "./pages/LandingPage";
 import TPODashboard from "./pages/TPODashboard";
 import StudentDashboard from "./pages/StudentDashboard";
+import RecruiterDashboard from "./pages/RecruiterDashboard";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 const App = () => (<QueryClientProvider client={queryClient}>
@@ -23,6 +24,8 @@ const App = () => (<QueryClientProvider client={queryClient}>
               <Route path="/dashboard/*" element={<TPODashboard />}/>
               <Route path="/student" element={<StudentDashboard />}/>
               <Route path="/student/*" element={<StudentDashboard />}/>
+              <Route path="/recruiter" element={<RecruiterDashboard />}/>
+              <Route path="/recruiter/*" element={<RecruiterDashboard />}/>
               <Route path="*" element={<NotFound />}/>
             </Routes>
           </BrowserRouter>

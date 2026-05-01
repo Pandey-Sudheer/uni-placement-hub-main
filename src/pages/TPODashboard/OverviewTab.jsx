@@ -49,18 +49,23 @@ export default function OverviewTab() {
     const [backlogFilter, setBacklogFilter] = useState("all");
     const [skillFilter, setSkillFilter] = useState("all");
 
-    const allSkills = useMemo(() => [...new Set(students.flatMap((s) => s.skills))].sort(), [students]);
+    const allSkills = useMemo(() => [...new Set(students.flatMap((s) => s.skills || []))].sort(), [students]);
 
     const filtered = useMemo(() => {
         return students.filter((s) => {
-            const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) || s.email.toLowerCase().includes(search.toLowerCase());
+            const nameTarget = s?.name || "Unknown";
+            const emailTarget = s?.email || "Unknown";
+            const searchStr = search || "";
+            
+            const matchSearch = nameTarget.toLowerCase().includes(searchStr.toLowerCase()) || 
+                                emailTarget.toLowerCase().includes(searchStr.toLowerCase());
             const matchCgpa = cgpaFilter === "all" || (cgpaFilter === "9+" && s.cgpa >= 9) || (cgpaFilter === "8+" && s.cgpa >= 8) || (cgpaFilter === "7+" && s.cgpa >= 7) || (cgpaFilter === "<7" && s.cgpa < 7);
             const matchYear = yearFilter === "all" || s.graduationYear === Number(yearFilter);
             const matchBacklog = backlogFilter === "all" || (backlogFilter === "none" && s.backlogs === 0) || (backlogFilter === "has" && s.backlogs > 0);
-            const matchSkill = skillFilter === "all" || s.skills.includes(skillFilter);
+            const matchSkill = skillFilter === "all" || (s.skills || []).includes(skillFilter);
             return matchSearch && matchCgpa && matchYear && matchBacklog && matchSkill;
         });
-    }, [search, cgpaFilter, yearFilter, backlogFilter, skillFilter]);
+    }, [search, cgpaFilter, yearFilter, backlogFilter, skillFilter, students]);
 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Briefcase, FileText, Settings, LogOut, GraduationCap, UserCircle, Building2, Bell, } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, FileText, Settings, LogOut, GraduationCap, UserCircle, Building2, Bell, Globe2, MapPin } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,14 +8,22 @@ const tpoItems = [
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
     { title: "Student Directory", url: "/dashboard/students", icon: Users },
     { title: "Placement Drives", url: "/dashboard/drives", icon: Briefcase },
+    { title: "Applications ATS", url: "/dashboard/applications", icon: FileText },
     { title: "Reports", url: "/dashboard/reports", icon: FileText },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
 ];
 const studentItems = [
     { title: "My Profile", url: "/student", icon: UserCircle },
     { title: "Job Listings", url: "/student/jobs", icon: Building2 },
+    { title: "Internships", url: "/student/internships", icon: MapPin },
+    { title: "Global Jobs", url: "/student/global-jobs", icon: Globe2 },
     { title: "Applications", url: "/student/applications", icon: FileText },
     { title: "Notifications", url: "/student/notifications", icon: Bell },
+];
+const recruiterItems = [
+    { title: "Dashboard", url: "/recruiter", icon: LayoutDashboard },
+    { title: "My Drives", url: "/recruiter/drives", icon: Briefcase },
+    { title: "Applicant ATS", url: "/recruiter/applications", icon: Users },
 ];
 export function AppSidebar() {
     const { role, logout } = useAuth();
@@ -23,7 +31,7 @@ export function AppSidebar() {
     const collapsed = state === "collapsed";
     const location = useLocation();
     const navigate = useNavigate();
-    const items = role === "tpo" ? tpoItems : studentItems;
+    const items = role === "tpo" ? tpoItems : role === "recruiter" ? recruiterItems : studentItems;
     const currentPath = location.pathname;
     const handleLogout = () => {
         logout();

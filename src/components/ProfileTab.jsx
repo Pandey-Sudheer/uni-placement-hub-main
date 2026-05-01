@@ -26,21 +26,36 @@ export default function ProfileTab() {
            });
     }, []);
     const update = (field, value) => setProfile((p) => ({ ...p, [field]: value }));
-    const handleResume = (e) => {
+    const [uploading, setUploading] = useState(false);
+
+    const handleResume = async (e) => {
         const file = e.target.files?.[0];
-        if (!file)
-            return;
-        if (file.type !== "application/pdf") {
-            toast({ title: "Invalid file", description: "Please upload a PDF file.", variant: "destructive" });
+        if (!file) return;
+        if (!["application/pdf", "image/jpeg", "image/png", "image/jpg"].includes(file.type)) {
+            toast({ title: "Invalid file", description: "Please upload a PDF or Image file.", variant: "destructive" });
             return;
         }
         if (file.size > 5 * 1024 * 1024) {
             toast({ title: "File too large", description: "Resume must be under 5 MB.", variant: "destructive" });
             return;
         }
-        update("resumeFile", file);
-        update("resumeName", file.name);
-        toast({ title: "Resume uploaded", description: file.name });
+        
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('resume', file);
+
+        try {
+            const res = await api.post('/student/resume', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            setProfile(res.data);
+            toast({ title: "Resume uploaded", description: "Your resume has been saved securely." });
+        } catch (err) {
+            toast({ title: "Upload failed", description: "Could not upload resume to the server.", variant: "destructive" });
+        } finally {
+            setUploading(false);
+            if (fileRef.current) fileRef.current.value = "";
+        }
     };
     const handleSave = async () => {
         try {
@@ -59,14 +74,25 @@ export default function ProfileTab() {
       <Input type={type} value={String(profile[field] || "")} onChange={(e) => update(field, type === "number" ? Number(e.target.value) : e.target.value)} disabled={!editing || disabled} className="disabled:opacity-70 bg-background/50 border-primary/20 focus-visible:ring-primary/30"/>
     </div>);
 
-    const requiredFields = profile ? [profile.name, profile.department, profile.cgpa, profile.skills?.length > 0] : [];
-    const filledCount = requiredFields.filter(Boolean).length;
-    const completionPercentage = profile ? Math.round((filledCount / requiredFields.length) * 100) : 0;
+    const requiredChecks = profile ? [
+        !!profile.name,
+        !!profile.phone,
+        !!profile.department,
+        !!profile.graduationYear,
+        profile.cgpa !== undefined && profile.cgpa !== null && profile.cgpa !== "",
+        profile.tenthMarks !== undefined && profile.tenthMarks !== null && profile.tenthMarks !== "",
+        profile.twelfthMarks !== undefined && profile.twelfthMarks !== null && profile.twelfthMarks !== "",
+        profile.backlogs !== undefined && profile.backlogs !== null && profile.backlogs !== "",
+        profile.skills?.length > 0,
+        !!profile.resumeName
+    ] : [];
+    const filledCount = requiredChecks.filter(Boolean).length;
+    const completionPercentage = profile ? Math.round((filledCount / requiredChecks.length) * 100) : 0;
 
     if (loading) return <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
     if (!profile) return <div>Failed to load profile.</div>;
 
-    return (<div className="space-y-6">
+    return (<div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-extrabold text-foreground tracking-tight">My Profile</h2>
         {editing ? (<div className="flex gap-3">
@@ -144,19 +170,31 @@ export default function ProfileTab() {
         <div className="flex items-center gap-2 text-foreground font-bold text-lg border-b border-border/50 pb-3">
           <FileText className="h-5 w-5 text-primary"/> Resume
         </div>
-        <input ref={fileRef} type="file" accept=".pdf" className="hidden" onChange={handleResume}/>
+        <input ref={fileRef} type="file" accept=".pdf,image/jpeg,image/png,image/jpg" className="hidden" onChange={handleResume}/>
         <div className="flex items-center gap-4 bg-background/50 p-4 rounded-xl border border-primary/10">
-          {profile.resumeName ? (<div className="flex items-center gap-3 text-sm font-semibold text-foreground px-2">
+          {uploading ? (
+            <div className="flex items-center gap-3 text-sm font-semibold text-foreground px-2">
+                <Loader2 className="h-6 w-6 text-primary animate-spin" />
+                <p>Uploading securely...</p>
+            </div>
+          ) : profile.resumeName ? (<div className="flex items-center gap-3 text-sm font-semibold text-foreground px-2">
               <div className="h-10 w-10 bg-primary/20 flex items-center justify-center rounded-lg">
                 <FileText className="h-5 w-5 text-primary"/>
               </div>
               <div>
                 <p>{profile.resumeName}</p>
-                <p className="text-xs text-muted-foreground font-normal">Uploaded & Ready</p>
+                <div className="flex gap-2 items-center">
+                    <p className="text-xs text-success font-medium">✅ Uploaded & Ready</p>
+                    {profile.resumeUrl && (
+                        <a href={`http://localhost:5000${profile.resumeUrl}`} target="_blank" rel="noopener noreferrer" className="text-xs text-primary font-bold hover:underline">
+                            View Resume
+                        </a>
+                    )}
+                </div>
               </div>
             </div>) : (<p className="text-sm font-medium text-muted-foreground px-2">No resume uploaded yet.</p>)}
-          <Button variant={profile.resumeName ? "outline" : "default"} size="sm" onClick={() => fileRef.current?.click()} className="ml-auto gap-2 rounded-full">
-            <Upload className="h-4 w-4"/> {profile.resumeName ? "Replace file" : "Upload PDF"}
+          <Button variant={profile.resumeName ? "outline" : "default"} size="sm" onClick={() => fileRef.current?.click()} disabled={uploading} className="ml-auto gap-2 rounded-full">
+            <Upload className="h-4 w-4"/> {uploading ? "Uploading..." : profile.resumeName ? "Replace file" : "Upload File"}
           </Button>
         </div>
       </div>

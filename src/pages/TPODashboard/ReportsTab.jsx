@@ -39,11 +39,11 @@ export default function ReportsTab() {
   ];
   const STATUS_COLORS = ['#10b981', '#f59e0b', '#ef4444'];
 
-  const years = [...new Set(students.map(s => s.graduationYear))].sort();
+  const years = [...new Set(students.map(s => s.graduationYear || "Unknown"))].sort();
   const yearData = years.map(year => ({
     year: year.toString(),
-    Placed: students.filter(s => s.graduationYear === year && s.status === "Placed").length,
-    Unplaced: students.filter(s => s.graduationYear === year && s.status !== "Placed").length,
+    Placed: students.filter(s => (s.graduationYear || "Unknown") === year && s.status === "Placed").length,
+    Unplaced: students.filter(s => (s.graduationYear || "Unknown") === year && s.status !== "Placed").length,
   }));
 
   const exportCSV = () => {

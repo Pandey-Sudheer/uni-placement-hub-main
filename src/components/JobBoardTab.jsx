@@ -22,7 +22,7 @@ const statusConfig = {
     Completed: { variant: "secondary", icon: XCircle },
 };
 
-export default function JobBoardTab() {
+export default function JobBoardTab({ type = "All" }) {
     const containerVariants = {
         hidden: { opacity: 0 },
         show: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -67,24 +67,31 @@ export default function JobBoardTab() {
     };
 
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 12;
     
-    const totalPages = Math.ceil(drives.length / itemsPerPage);
-    const currentData = drives.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    // Filter drives by type before paginating!
+    const filteredDrives = drives.filter(d => (type === "All" || d.employmentType === type) && d.status !== "Completed");
+
+    const totalPages = Math.ceil(filteredDrives.length / itemsPerPage);
+    const currentData = filteredDrives.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     if (loading) return <div className="flex justify-center p-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
     return (<div className="space-y-6">
       <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-        <h2 className="text-2xl font-extrabold text-foreground tracking-tight">Job Board</h2>
-        <p className="text-sm font-medium text-muted-foreground mt-1">Upcoming company visits and placement drives</p>
+        <h2 className="text-2xl font-extrabold text-foreground tracking-tight">
+          {type === "Internship" ? "Internship Board" : type === "Full-Time" ? "Full-Time Jobs" : "Job Board"}
+        </h2>
+        <p className="text-sm font-medium text-muted-foreground mt-1">
+          {type === "Internship" ? "Exclusive internship opportunities for students" : "Upcoming company visits and placement drives"}
+        </p>
       </motion.div>
 
       <motion.div 
         variants={containerVariants}
         initial="hidden"
         animate="show"
-        className="grid grid-cols-1 xl:grid-cols-2 gap-6"
+        className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
       >
         {currentData.map((drive) => {
             const { eligible, reason } = checkEligibility(profile, drive);
@@ -146,7 +153,7 @@ export default function JobBoardTab() {
       {totalPages > 1 && (
         <div className="flex items-center justify-between pt-4 border-t border-border/50">
           <p className="text-xs font-semibold text-muted-foreground">
-            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, mockDrives.length)} of {mockDrives.length} active drives
+            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, drives.length)} of {drives.length} active drives
           </p>
           <div className="flex items-center gap-2">
             <Button 

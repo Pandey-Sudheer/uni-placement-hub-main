@@ -12,7 +12,7 @@ const LandingPage = () => {
 
     const handleLogin = async (role) => {
         const success = await login(role);
-        if(success) navigate(role === "tpo" ? "/dashboard" : "/student");
+        if(success) navigate(role === "tpo" ? "/dashboard" : role === "recruiter" ? "/recruiter" : "/student");
     };
 
     const containerVariants = {
@@ -81,14 +81,18 @@ const LandingPage = () => {
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-medium leading-relaxed">
               Streamline the entire placement journey. From dazzling student portfolios to recruiter Kanban ATS pipelines and 1-click university accreditation reports.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6 flex-wrap">
               <Button size="lg" onClick={() => handleLogin("student")} className="gap-2 text-lg px-8 py-6 rounded-full glass-card border-primary/50 text-foreground hover:bg-primary/5 shadow-card-hover group">
                 <GraduationCap className="h-5 w-5 text-primary group-hover:scale-110 transition-transform"/>
                 Student Access
               </Button>
               <Button size="lg" onClick={() => handleLogin("tpo")} className="gap-2 text-lg px-8 py-6 rounded-full bg-primary text-primary-foreground hover:opacity-90 shadow-card-hover glow-primary group">
+                <Shield className="h-5 w-5 group-hover:scale-110 transition-transform"/>
+                Super Admin (TPO)
+              </Button>
+              <Button size="lg" onClick={() => handleLogin("recruiter")} className="gap-2 text-lg px-8 py-6 rounded-full border-success/50 text-success hover:bg-success/5 shadow-card-hover group bg-background">
                 <Briefcase className="h-5 w-5 group-hover:scale-110 transition-transform"/>
-                Recruiter / Admin
+                Company Partners
               </Button>
             </div>
             <p className="text-xs text-muted-foreground pt-4 font-semibold">Join 120+ top tier universities using UniPlace today.</p>

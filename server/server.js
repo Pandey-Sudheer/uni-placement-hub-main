@@ -12,6 +12,11 @@ app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/seed', require('./routes/seed.routes'));
 app.use('/api/student', require('./routes/student.routes'));
 app.use('/api/admin', require('./routes/admin.routes'));
+app.use('/api/recruiter', require('./routes/recruiter.routes'));
+
+// Serve resume PDF uploads statically
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/api/health', (req, res) => res.json({ status: 'API is running' }));
 
